@@ -1,0 +1,13 @@
+[build]
+  # Projeyi derlemek için çalıştırılacak komut (Bun yerine NPM kullanıyoruz)
+  command = "npm install && npm run build" 
+  
+  # Derleme sonucunda oluşan statik dosyaların bulunduğu klasör (Vite varsayılanı)
+  publish = "dist"
+
+# Single Page Application (SPA) olduğu için bu zorunludur.
+# Tüm URL'leri index.html'e yönlendirir.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
