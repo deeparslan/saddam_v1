@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true, // Vite bunu halledeceği için tsc'nin JS çıktısı vermesine gerek yok
+    "jsx": "react-jsx", // JSX kodu React elemanlarına çevir
+
+    /* Type Checking */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  // Hangi dosyaların derleneceğini Vite'ın varsayılanlarına göre ayarlar
+  "include": ["src/**/*"],
+  "references": [
+    { "path": "./tsconfig.node.json" } // Eğer varsa, Node.js yapılandırmasını dahil eder
+  ]
+}
