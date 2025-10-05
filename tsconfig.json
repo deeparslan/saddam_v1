@@ -29,7 +29,16 @@
     "noFallthroughCasesInSwitch": true
   },
   // Bu kısım VİTE dosyalarını içerir
-  "include": ["src/**/*", "vite.config.ts", "tailwind.config.js"], 
+  // ESKİ HALİ: "include": ["src/**/*", "vite.config.ts"], 
+  
+  // YENİ HALİ: SADECE kaynak kodunu dahil et.
+  "include": ["src/**/*"],
+
+  // Yeni bir 'exclude' bölümü ekleyerek ayar dosyalarını derleme sürecinden çıkarın.
+  "exclude": [
+    "vite.config.ts", 
+    "tsconfig.node.json" // Varsa bunu da çıkaralım
+  ],
   "references": [
     { "path": "./tsconfig.node.json" }
   ]
