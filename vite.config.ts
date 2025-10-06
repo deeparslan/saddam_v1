@@ -4,14 +4,15 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  // **BURAYI EKLEYİN:** Vite'a projenin kök dizininin bu klasör olduğunu söyler
   root: '.',
-  
   plugins: [react()],
   resolve: {
     alias: {
-      // '@/' takma adını src klasörüne yönlendirir
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  // ÇÖZÜM: Rollup'ın bulamadığı harici paketi (dependency) önbelleğe alması için zorluyoruz.
+  optimizeDeps: {
+    include: ['@hookform/resolvers/zod'],
   },
 });
