@@ -1,7 +1,5 @@
 import React from 'react';
-// YALNIZCA Kalan bileşenler: Card bileşenleri (Card'lar eksikse bir sonraki adımda silinecektir)
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; 
-// Button import'u SİLİNDİ
+// Card, Button ve Table import'ları SİLİNDİ
 import { PlusCircle, RefreshCw } from 'lucide-react';
 import { TOTAL_ROUNDS } from '@/lib/game-store';
 
@@ -32,29 +30,28 @@ export function Scoreboard({ players, scores, currentRound, onLogRound, onReset 
         </button>
       </div>
       
-      <Card className="shadow-lg rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-2xl">Tur {currentRound} / {TOTAL_ROUNDS}</CardTitle>
-        </CardHeader>
+      {/* CARD BİLEŞENİ YERİNE BASİT DIV KULLANDIK */}
+      <div className="shadow-lg rounded-2xl border p-4"> 
+        <div className="border-b pb-2 mb-4">
+          <h2 className="text-2xl font-bold">Tur {currentRound} / {TOTAL_ROUNDS}</h2>
+        </div>
         
-        <CardContent>
-          {/* GEÇİCİ ÇÖZÜM: Eksik 'table' bileşeni kaldırıldı */}
-          <div className="text-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border border-dashed border-gray-400">
-            <p className="text-red-500 font-bold mb-1">SKOR TABLOSU EKSİK</p>
-            <p className="text-sm text-muted-foreground">('table' bileşeni eksik olduğu için geçici olarak kaldırıldı.)</p>
+        {/* TABLO BÖLÜMÜ */}
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg border border-dashed border-gray-400">
+            <p className="text-red-500 font-bold mb-1 text-center">SKOR TABLOSU EKSİK</p>
+            <p className="text-sm text-muted-foreground text-center mb-4">('Card', 'Table' ve 'Button' bileşenleri eksik olduğu için geçici olarak kaldırıldı.)</p>
+            
             <div className="mt-3 space-y-2">
                {players.map((name, index) => (
-                    <div key={index} className="flex justify-between text-lg font-medium">
+                    <div key={index} className="flex justify-between text-lg font-medium border-b last:border-b-0 py-1">
                         <span>{name}:</span>
                         <span className="font-bold text-2xl tabular-nums">{totalScores[index]}</span>
                     </div>
                 ))}
             </div>
-          </div>
-          {/* GEÇİCİ ÇÖZÜM SONU */}
-          
-        </CardContent>
-      </Card>
+        </div>
+        
+      </div>
       
       {/* LOG ROUND BUTONU YERİNE BASİT HTML BUTON */}
       <button
