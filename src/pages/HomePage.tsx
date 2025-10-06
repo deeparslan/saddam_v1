@@ -4,7 +4,6 @@ import { PlayerSetup } from '@/components/game/PlayerSetup';
 import { Scoreboard } from '@/components/game/Scoreboard';
 import { LogRoundDialog } from '@/components/game/LogRoundDialog';
 import { GameOver } from '@/components/game/GameOver';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { Gamepad2 } from 'lucide-react';
 export function HomePage() {
   const gameStatus = useGameStore((state) => state.gameStatus);
@@ -68,7 +67,6 @@ export function HomePage() {
   };
   return (
     <main className="min-h-screen bg-background text-foreground relative">
-      <ThemeToggle className="absolute top-4 right-4 z-50" />
       <div className="container mx-auto p-4 sm:p-6 lg:p-8">
         {gameStatus !== 'setup' && (
           <header className="flex items-center justify-center space-x-4 mb-8">
