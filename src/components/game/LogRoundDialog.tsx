@@ -2,16 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+// SİLİNDİ: Button, Input, Form, Dialog, Select, Checkbox, ScrollArea, cn
 import { Star } from 'lucide-react';
 import { LoserOptions } from '@/lib/game-store';
+
 const colorCoefficients = {
   blue: 5,
   red: 4,
@@ -20,6 +14,8 @@ const colorCoefficients = {
   star: 10,
 };
 type Color = keyof typeof colorCoefficients;
+
+// Form şeması ve tipler korundu
 const logRoundSchema = z.object({
   winner: z.string().min(1, 'Kazanan seçmelisiniz.'),
   isWinnerCift: z.boolean(),
@@ -37,6 +33,7 @@ const logRoundSchema = z.object({
   ),
 });
 type LogRoundFormValues = z.infer<typeof logRoundSchema>;
+
 interface LogRoundDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -51,6 +48,7 @@ interface LogRoundDialogProps {
     isWinnerOkeyAtti: boolean
   ) => void;
 }
+
 export function LogRoundDialog({ isOpen, onOpenChange, players, currentRound, onSubmit }: LogRoundDialogProps) {
   const [selectedColor, setSelectedColor] = useState<Color | null>(null);
   const form = useForm<LogRoundFormValues>({
@@ -66,10 +64,12 @@ export function LogRoundDialog({ isOpen, onOpenChange, players, currentRound, on
       }, {} as LogRoundFormValues['loserOptions']),
     },
   });
+
   const winner = form.watch('winner');
   const scores = form.watch('scores');
   const loserOptions = form.watch('loserOptions');
   const winnerIndex = winner ? parseInt(winner, 10) : -1;
+
   useEffect(() => {
     if (isOpen) {
       const initialLoserOptions: { [key: string]: { isCift: boolean; isOkeyeDonuyor: boolean } } = {};
@@ -86,7 +86,9 @@ export function LogRoundDialog({ isOpen, onOpenChange, players, currentRound, on
       setSelectedColor(null);
     }
   }, [isOpen, form, players]);
+
   const otherPlayers = players.map((_, index) => index).filter((index) => index !== winnerIndex);
+  
   const allScoresFilled =
     winnerIndex !== -1 &&
     otherPlayers.every((index) => {
@@ -95,6 +97,7 @@ export function LogRoundDialog({ isOpen, onOpenChange, players, currentRound, on
       const score = scores?.[index];
       return score !== undefined && score !== null && !isNaN(score);
     });
+
   const handleFormSubmit = (data: LogRoundFormValues) => {
     if (!selectedColor) {
       form.setError('root', { type: 'manual', message: 'Lütfen bir renk seçin.' });
@@ -109,20 +112,30 @@ export function LogRoundDialog({ isOpen, onOpenChange, players, currentRound, on
     onSubmit(winnerIndex, loserScores, data.loserOptions, colorCoefficients[selectedColor], data.isWinnerCift, data.isWinnerOkeyAtti);
     onOpenChange(false);
   };
+  
   const isFormValid = form.formState.isValid && selectedColor !== null && allScoresFilled;
+  
+  // Dialog yerine basit DIV ve Modalsız yaklaşım
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] rounded-2xl flex flex-col h-[90vh] max-h-[700px]">
-        <DialogHeader>
-          <DialogTitle className="text-3xl font-display">Tur {currentRound} Puanları</DialogTitle>
-          <DialogDescription className="text-lg">Kazananı, rengi ve diğer oyuncuların ceza puanlarını girin.</DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col flex-grow overflow-hidden">
-            <ScrollArea className="flex-grow pr-6 -mr-6">
-              <div className="space-y-6">
+    // DIALOG YERİNE SABİT VE BASİT BİR MODAL KULLANILDI
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 relative">
+        
+        {/* DIALOG HEADER YERİNE BASİT HEADER */}
+        <header className="pb-4 mb-4 border-b">
+          <h2 className="text-3xl font-display font-bold">Tur {currentRound} Puanları</h2>
+          <p className="text-lg text-muted-foreground">Kazananı, rengi ve diğer oyuncuların ceza puanlarını girin.</p>
+        </header>
+        
+        {/* FORM YERİNE BASİT FORM */}
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+            
+            {/* SCROLL AREA YERİNE DIV */}
+            <div className="space-y-6">
                 <div>
-                  <FormLabel className="text-lg">Renk Katsayısı</FormLabel>
+                  <label className="text-lg block mb-2">Renk Katsayısı</label>
                   <div className="grid grid-cols-5 gap-2 pt-2">
                     {(Object.keys(colorCoefficients) as Color[]).map((color) => (
                       <button
@@ -132,182 +145,156 @@ export function LogRoundDialog({ isOpen, onOpenChange, players, currentRound, on
                           setSelectedColor(color);
                           form.clearErrors('root');
                         }}
-                        className={cn(
-                          'h-24 rounded-lg border-2 transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                          selectedColor === color ? 'scale-105 shadow-lg' : 'opacity-70 hover:opacity-100',
-                          color === 'blue' && 'bg-white border-playful-blue',
-                          color === 'red' && 'bg-white border-playful-red',
-                          color === 'yellow' && 'bg-white border-playful-yellow',
-                          color === 'black' && 'bg-white border-playful-black',
-                          color === 'star' && 'bg-playful-black border-white/50'
-                        )}
+                        // Tailwind sınıfları, cn fonksiyonu olmadığı için kısmen manuel eklendi
+                        className={`h-16 rounded-lg border-2 transition-all duration-200 flex items-center justify-center 
+                          ${selectedColor === color ? 'scale-105 shadow-lg border-4' : 'opacity-70 hover:opacity-100'}
+                          ${color === 'blue' ? 'border-blue-500' : ''}
+                          ${color === 'red' ? 'border-red-500' : ''}
+                          ${color === 'yellow' ? 'border-yellow-500' : ''}
+                          ${color === 'black' ? 'border-gray-900' : ''}
+                          ${color === 'star' ? 'bg-gray-900 border-white/50' : 'bg-white'}`}
                       >
                         {color === 'star' ? (
-                          <Star className="w-7 h-7 text-white" />
+                          <Star className="w-6 h-6 text-white" />
                         ) : (
                           <Star
-                            className={cn(
-                              'w-7 h-7',
-                              color === 'blue' && 'text-playful-blue fill-playful-blue',
-                              color === 'red' && 'text-playful-red fill-playful-red',
-                              color === 'yellow' && 'text-playful-yellow fill-playful-yellow',
-                              color === 'black' && 'text-playful-black fill-playful-black'
-                            )}
+                            className={`w-6 h-6 ${color === 'blue' ? 'text-blue-500 fill-blue-500' : ''}
+                            ${color === 'red' ? 'text-red-500 fill-red-500' : ''}
+                            ${color === 'yellow' ? 'text-yellow-500 fill-yellow-500' : ''}
+                            ${color === 'black' ? 'text-gray-900 fill-gray-900' : ''}`}
                           />
                         )}
                       </button>
                     ))}
                   </div>
-                  <FormMessage className="text-center pt-2">{form.formState.errors.root?.message}</FormMessage>
-                </div>
-                <FormField
-                  control={form.control}
-                  name="winner"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg">Kazanan</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="p-6 rounded-2xl text-lg">
-                            <SelectValue placeholder="Kazanan oyuncuyu seçin" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {players.map((name, index) => (
-                            <SelectItem key={index} value={String(index)} className="text-lg">
-                              {name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
+                  {/* FormMessage yerine basit p etiketi */}
+                  {form.formState.errors.root?.message && (
+                     <p className="text-red-500 text-sm text-center pt-2">{form.formState.errors.root.message}</p>
                   )}
-                />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-lg block">Kazanan</label>
+                  {/* SELECT YERİNE BASİT HTML SELECT */}
+                  <select 
+                    {...form.register("winner")} 
+                    className="w-full p-3 border border-gray-300 rounded-lg text-lg bg-white"
+                  >
+                    <option value="" disabled>Kazanan oyuncuyu seçin</option>
+                    {players.map((name, index) => (
+                      <option key={index} value={String(index)}>{name}</option>
+                    ))}
+                  </select>
+                  {form.formState.errors.winner && (
+                    <p className="text-red-500 text-sm">{form.formState.errors.winner.message}</p>
+                  )}
+                </div>
+
                 {winnerIndex !== -1 && (
                   <div className="p-4 border rounded-2xl space-y-4">
-                    <FormLabel className="text-lg">Kazanan Bitiş Türü</FormLabel>
+                    <label className="text-lg block">Kazanan Bitiş Türü</label>
                     <div className="flex items-center space-x-4 pt-2">
-                      <FormField
-                        control={form.control}
-                        name="isWinnerCift"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Çift</FormLabel>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="isWinnerOkeyAtti"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            <FormControl>
-                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>Okey attı</FormLabel>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
+                      {/* Çift Checkbox */}
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="isWinnerCift"
+                          {...form.register("isWinnerCift")}
+                          className="w-4 h-4"
+                        />
+                        <label htmlFor="isWinnerCift">Çift</label>
+                      </div>
+                      {/* Okey Attı Checkbox */}
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="isWinnerOkeyAtti"
+                          {...form.register("isWinnerOkeyAtti")}
+                        />
+                        <label htmlFor="isWinnerOkeyAtti">Okey attı</label>
+                      </div>
                     </div>
                   </div>
                 )}
+                
                 {winnerIndex !== -1 && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-medium">Ceza Puanları</h3>
                     {players.map((name, index) => {
                       if (index === winnerIndex) return null;
-                      const isOkeyeDonuyor = loserOptions?.[index]?.isOkeyeDonuyor;
+                      const isOkeyeDonuyor = loserOptions?.[index]?.isOkeyeDoniyor;
                       return (
-                        <div key={index} className="p-4 border rounded-2xl space-y-4">
-                          <FormField
-                            control={form.control}
-                            name={`scores.${index}`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-lg">{name} (Kalan Taş Toplamı)</FormLabel>
-                                <FormControl>
-                                  <Input
+                        <div key={index} className="p-4 border rounded-2xl space-y-4 bg-muted/50">
+                          
+                            <div className="space-y-1">
+                                <label className="text-lg block">{name} (Kalan Taş Toplamı)</label>
+                                {/* INPUT YERİNE BASİT HTML INPUT */}
+                                <input
                                     type="number"
                                     placeholder="Ceza puanı"
-                                    {...field}
-                                    onChange={(e) => {
-                                      const value = e.target.value;
-                                      field.onChange(value === '' ? undefined : Number(value));
-                                    }}
-                                    value={field.value ?? ''}
-                                    className="p-6 rounded-2xl text-lg"
+                                    {...form.register(`scores.${index}`, { valueAsNumber: true })}
+                                    className="w-full p-3 border border-gray-300 rounded-lg text-lg"
                                     disabled={isOkeyeDonuyor}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                                />
+                                {form.formState.errors.scores && form.formState.errors.scores[index] && (
+                                    <p className="text-red-500 text-sm">
+                                        {(form.formState.errors.scores[index] as any)?.message}
+                                    </p>
+                                )}
+                            </div>
+                          
                           <div className="flex items-center space-x-4">
-                            <FormField
-                              control={form.control}
-                              name={`loserOptions.${index}.isCift`}
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                  </FormControl>
-                                  <div className="space-y-1 leading-none">
-                                    <FormLabel>Çift</FormLabel>
-                                  </div>
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={form.control}
-                              name={`loserOptions.${index}.isOkeyeDonuyor`}
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value}
-                                      onCheckedChange={(checked) => {
-                                        field.onChange(checked);
-                                        if (checked) {
-                                          form.setValue(`scores.${index}`, undefined);
-                                        }
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <div className="space-y-1 leading-none">
-                                    <FormLabel>Okey'e dönüyor</FormLabel>
-                                  </div>
-                                </FormItem>
-                              )}
-                            />
+                            {/* Çift Checkbox */}
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id={`isCift-${index}`}
+                                {...form.register(`loserOptions.${index}.isCift`)}
+                                className="w-4 h-4"
+                              />
+                              <label htmlFor={`isCift-${index}`}>Çift</label>
+                            </div>
+                            
+                            {/* Okey'e Dönüyor Checkbox */}
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                id={`isOkeyeDonuyor-${index}`}
+                                {...form.register(`loserOptions.${index}.isOkeyeDonuyor`, {
+                                  onChange: (e) => {
+                                    if (e.target.checked) {
+                                      form.setValue(`scores.${index}`, undefined);
+                                    }
+                                  }
+                                })}
+                              />
+                              <label htmlFor={`isOkeyeDonuyor-${index}`}>Okey'e dönüyor</label>
+                            </div>
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 )}
-              </div>
-            </ScrollArea>
-            <div className="pt-6">
-              <Button
+            </div>
+            
+            <div className="pt-4">
+              {/* BUTTON YERİNE BASİT HTML BUTTON */}
+              <button
                 type="submit"
                 disabled={!isFormValid}
-                className="w-full text-xl p-8 rounded-2xl bg-playful-blue hover:bg-playful-blue/90 disabled:bg-muted disabled:opacity-50"
+                className="w-full text-xl p-4 rounded-2xl bg-playful-blue text-white font-bold hover:bg-playful-blue/90 disabled:bg-gray-400 disabled:opacity-70 transition-colors"
               >
                 Turu Kaydet
-              </Button>
+              </button>
             </div>
           </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+
+        {/* Diyalog kapatma butonu (X) */}
+        <button onClick={() => onOpenChange(false)} className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200">
+             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+    </div>
   );
 }
