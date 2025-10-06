@@ -4,7 +4,6 @@ import { PlayerSetup } from '@/components/game/PlayerSetup';
 import { Scoreboard } from '@/components/game/Scoreboard';
 import { LogRoundDialog } from '@/components/game/LogRoundDialog';
 import { GameOver } from '@/components/game/GameOver';
-import { Toaster, toast } from '@/components/ui/sonner';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Gamepad2 } from 'lucide-react';
 export function HomePage() {
@@ -82,7 +81,6 @@ export function HomePage() {
       <footer className="absolute bottom-4 w-full text-center text-muted-foreground/80">
         <p>Built with ❤️ at Cloudflare</p>
       </footer>
-      <Toaster richColors closeButton />
     </main>
   );
 }
