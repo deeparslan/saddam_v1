@@ -11,7 +11,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // ÇÖZÜM BURADA: Rollup'ın bulamadığı paketleri optimize etmesini söylüyoruz.
+  // ÇÖZÜM: Rollup'ın bulamadığı harici paketi (dependency) önbelleğe alması için zorluyoruz.
   optimizeDeps: {
     include: ['@hookform/resolvers/zod'],
   },
